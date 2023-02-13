@@ -1,2 +1,2 @@
 #!/bin/bash
-ind . -name ".gif" -printf '%f\n' -type f | sort -f
+ind . -name ".gif" -printf '%f\n' -type f | LC_ALL=C sort -f |rev | cut-b 5- | rev
