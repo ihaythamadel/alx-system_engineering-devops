@@ -1,2 +1,2 @@
 #!/bin/bash
-echo divided by equals $((POWER/DIVIDE))
+echo Power by equals $((POWER/DIVIDE))
