@@ -1,32 +1,32 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Script to manage process and perform tasks
+file="/var/run/my_process.pid"
+func_start()
+{
+	./manage_my_process &
+	echo "$!" > "$file"
+}
 
+func_stop()
+{
+	kill "$(cat $file)"
+	rm $file
+}
 case "$1" in
-  start)
-    if [ -f /var/run/my_process.pid ]; then
-      echo "manage_my_process is already running."
-      exit 1
-    fi
-    ./manage_my_process &
-    echo $! > /var/run/my_process.pid
-    echo "manage_my_process started"
-    ;;
-  stop)
-    if [ ! -f /var/run/my_process.pid ]; then
-      echo "manage_my_process is not running."
-      exit 1
-    fi
-    kill $(cat /var/run/my_process.pid)
-    rm /var/run/my_process.pid
-    echo "manage_my_process stopped"
-    ;;
-  restart)
-    $0 stop
-    sleep 1
-    $0 start
-    echo "manage_my_process restarted"
-    ;;
-  *)
-    echo "Usage: $0 {start|stop|restart}"
-    exit 1
-    ;;
+     start)
+	func_start
+	echo "manage_my_process started"
+	;;
+     stop)
+	func_stop
+	echo "manage_my_process stopped"
+	;;
+     restart)
+	func_stop
+	func_start
+	echo "manage_my_process restarted"
+	;;
+     *)
+	echo "Usage: manage_my_process {start|stop|restart}"
+	;;
 esac
