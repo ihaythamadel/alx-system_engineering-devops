@@ -1,34 +1,42 @@
-#!/usr/bin/python3
-'''
-Module contains a function that makes an api call
-'''
 import requests
 
+def number_of_subscribers(subreddit, user_agent):
+    url = f"https://www.reddit.com/r/{subreddit}/about.json"
+    headers = {'User-Agent': user_agent}
 
-def number_of_subscribers(subreddit):
-    '''
-    Makes an API call to get the number of
-    subscribers in a given subreddit.
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Raise an exception for bad responses (4xx and 5xx)
+        
+        # Parse the JSON response and extract the number of subscribers
+        data = response.json()
+        subscribers = data['data']['subscribers']
+        return subscribers
+    except requests.exceptions.HTTPError as errh:
+        print(f"HTTP Error: {errh}")
+    except requests.exceptions.ConnectionError as errc:
+        print(f"Error Connecting: {errc}")
+    except requests.exceptions.Timeout as errt:
+        print(f"Timeout Error: {errt}")
+    except requests.exceptions.RequestException as err:
+        print(f"An unexpected error occurred: {err}")
+    
+    # Return 0 for any error
+    return 0
 
-    Args:
-        subreddit (str): The name of the subreddit
-        to check the number of subscribers.
+# Example usage
+if __name__ == '__main__':
+    import sys
 
-    Returns:
-        int: Number of subscribers for the subreddit,
-        or 0 if the subreddit is invalid.
-    '''
-    # URL for the Reddit API endpoint
-    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
-
-    # Make a GET request to the API with a custom User-Agent
-    data = requests.get(url, headers={'User-agent': 'my-bot'})
-
-    # Check if the request was successful (status code 200)
-    if data.status_code == 200:
-        # Parse the JSON response to get the number of subscribers
-        return data.json().get('data').get('subscribers')
+    if len(sys.argv) < 3:
+        print("Usage: python3 0-main.py <subreddit> <user_agent>")
     else:
-        # Invalid subreddit or other error, return 0
-        print(f"Error: {data.status_code}")
-        return 0
+        subreddit = sys.argv[1]
+        user_agent = sys.argv[2]
+        
+        subscribers = number_of_subscribers(subreddit, user_agent)
+        
+        if subscribers != 0:
+            print(f"The subreddit '{subreddit}' has {subscribers} subscribers.")
+        else:
+            print(f"Failed to retrieve subscriber count for subreddit '{subreddit}'.")
