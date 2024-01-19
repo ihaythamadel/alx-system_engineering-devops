@@ -1,26 +1,34 @@
 #!/usr/bin/python3
-"""Quering Reddit"""
-
+'''
+Module contains a function that makes an api call
+'''
 import requests
 
 
 def number_of_subscribers(subreddit):
-    """query a subreddit and retrieve the number of subscribers"""
+    '''
+    Makes an API call to get the number of
+    subscribers in a given subreddit.
 
-    # Reddit API endpoint for getting subreddit information
-    url = f"https://www.reddit.com/r/{subreddit}/about.json"
+    Args:
+        subreddit (str): The name of the subreddit
+        to check the number of subscribers.
 
-    # Set a custom User-Agent to avoid too many requests error
-    headers = {'User-Agent': 'My user Agent 1.0'}
+    Returns:
+        int: Number of subscribers for the subreddit,
+        or 0 if the subreddit is invalid.
+    '''
+    # URL for the Reddit API endpoint
+    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
 
-    # send a GET request to the Reddit API
-    response = requests.get(url, headers=headers, allow_redirects=False)
+    # Make a GET request to the API with a custom User-Agent
+    data = requests.get(url, headers={'User-agent': 'my-bot'})
 
-    # Check if the request was successful and not redirect
-    if response.status_code == 200 and not response.is_redirect:
-        # parse JSON response to extract the number of subscribers
-        data = response.json().get('data', {})
-        sub_count = data.get('subscribers', 0)
-        return sub_count
+    # Check if the request was successful (status code 200)
+    if data.status_code == 200:
+        # Parse the JSON response to get the number of subscribers
+        return data.json().get('data').get('subscribers')
     else:
+        # Invalid subreddit or other error, return 0
+        print(f"Error: {data.status_code}")
         return 0
