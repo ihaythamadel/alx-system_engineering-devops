@@ -1,19 +1,27 @@
 #!/usr/bin/python3
+"""
+function that queries the Reddit API and returns the number of subscribers
+(not active users, total subscribers) for a given subreddit
+"""
 import requests
 
+
 def number_of_subscribers(subreddit):
-    """Queries the Reddit API and returns the number of subscribers for a given subreddit."""
+    """ queries the Reddit API """
 
-    headers = {'User-Agent': 'your_user_agent_here'}  # Replace with your actual user agent
-    url = f"https://www.reddit.com/r/{subreddit}/about.json"
+    useragent = 'Mozilla/5.0'
 
-    response = requests.get(url, headers=headers, allow_redirects=False)
+    headers = {
+        'User-Agent': useragent
+    }
+    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
+    req = requests.get(url, headers=headers, allow_redirects=False)
 
-    if response.status_code == 200:
-        try:
-            data = response.json()
-            return data['data']['subscribers']
-        except (KeyError, ValueError):  # Handle cases where expected keys are missing
-            return 0
-    else:
+    if req.status_code != 200:
         return 0
+    d = req.json()
+    if 'data' not in d:
+        return 0
+    if 'subscribers' not in d.get('data'):
+        return 0
+    return d()['data']['subscribers']
